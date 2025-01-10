@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const validator = require("validator");
+
+const userModel = require('./userModel');
 
 const userSchema = new mongoose.Schema({
 
@@ -34,10 +37,9 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required'],
-    unique: true,
     trim: true,
     lowercase: true,
-    uniqueCaseInsensitive: true,
+    unique: [true,'A user is already registered with this email address.'],
     validate: validateEmail,
     match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
@@ -60,22 +62,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters long']
   },
-  is_admin: {
-    type: Boolean,
-    default: false
-  },
-  status: {
-    type: String,
-    default: "Inactive",
-    enum: {
-      values: ['Active', 'Inactive'],
-      message: '{VALUE} is not a valid status'
-    }
-  },
-  is_deleted:{
-    type:Boolean,
-    default:false
-  },
   created_at: {
     type: Date,
     default: Date.now
@@ -85,10 +71,10 @@ const userSchema = new mongoose.Schema({
 
 async function validateEmail(email) {
   if (!validator.isEmail(email)) throw new Error("Please enter a valid email address.")
-  const user = await userModel.findOne({ email })
-  if (user) throw new Error("A user is already registered with this email address.")
+  // const user = await userModel.findOne({ email })
+  // if (user) throw new Error("A user is already registered with this email address.")
 }
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('Users', userSchema);
 
 module.exports = User; 
